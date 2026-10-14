@@ -8,7 +8,7 @@ After you complete [Deployment](#deployment), paste your links here:
 
 | Resource | URL |
 | --- | --- |
-| Production app | `https://your-app.vercel.app` |
+| Production app | `https://marine-work-order-management.vercel.app/dashboard` |
 | GitHub repository | `https://github.com/alvinlaroya/Marine-Work-Order-Management.git` |
 
 ## Features
