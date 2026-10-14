@@ -77,7 +77,7 @@ erDiagram
   }
 
   mock_sessions {
-    uuid auth_user_id PK FK
+    uuid auth_user_id PK
     uuid active_profile_id FK
     uuid active_vessel_id FK
   }

@@ -3,6 +3,7 @@
 import { useIsFetching, useQuery } from "@tanstack/react-query";
 import { Anchor, SlidersHorizontal, TriangleAlert } from "lucide-react";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -21,6 +22,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSessionContext } from "@/hooks/use-session-context";
 import { ROLE_OPTIONS } from "@/lib/permissions";
+import { isAdminPath, OVERVIEW_PATH } from "@/lib/routes";
 import { queryKeys } from "@/lib/query-keys";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
@@ -92,6 +94,8 @@ function StepLabel({ step, htmlFor, highlight = false, children }: StepLabelProp
 }
 
 export function MockAuthBar() {
+  const router = useRouter();
+  const pathname = usePathname();
   const {
     status,
     profile,
@@ -147,6 +151,13 @@ export function MockAuthBar() {
     setSwitching(true);
     try {
       await switchMember(memberId);
+      if (
+        isAdminPath(pathname) &&
+        member !== undefined &&
+        member.role !== "Admin"
+      ) {
+        router.replace(OVERVIEW_PATH);
+      }
       toast.success(`Now viewing as ${member?.full_name ?? "selected member"}`);
     } catch (error) {
       toast.error(parseSupabaseError(error));
