@@ -16,15 +16,16 @@ function resolveHandler(handler: TableHandler | undefined): Promise<SupabaseMock
   return Promise.resolve(typeof handler === "function" ? handler() : handler);
 }
 
-function thenableChain(getResult: () => Promise<SupabaseMockResult>): Record<string, unknown> {
-  const chain: Record<string, unknown> = {};
+function thenableChain(
+  getResult: () => Promise<SupabaseMockResult>,
+): Record<string, unknown> & PromiseLike<SupabaseMockResult> {
+  const chain = {} as Record<string, unknown> & PromiseLike<SupabaseMockResult>;
   for (const method of ["select", "eq", "neq", "in", "order", "limit"]) {
     chain[method] = vi.fn(() => chain);
   }
   chain.maybeSingle = vi.fn(() => getResult());
   chain.single = vi.fn(() => getResult());
-  (chain as PromiseLike<SupabaseMockResult>).then = (onFulfilled, onRejected) =>
-    getResult().then(onFulfilled, onRejected);
+  chain.then = (onFulfilled, onRejected) => getResult().then(onFulfilled, onRejected);
   return chain;
 }
 
