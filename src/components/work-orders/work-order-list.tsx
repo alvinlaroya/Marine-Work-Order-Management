@@ -34,14 +34,10 @@ import {
   parseStatusTab,
   type StatusTab,
 } from "@/lib/work-order-filters";
+import { parsePage } from "@/lib/pagination";
 import { cn } from "@/lib/utils";
 
 const PAGE_SIZE = 10;
-
-function parsePage(value: string | null): number {
-  const page = Number.parseInt(value ?? "", 10);
-  return Number.isFinite(page) && page > 0 ? page : 1;
-}
 
 const DESCRIPTION = {
   Admin: "Every work order for the selected vessel.",

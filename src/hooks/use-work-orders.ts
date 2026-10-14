@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { useSessionContext } from "@/hooks/use-session-context";
 import { queryKeys } from "@/lib/query-keys";
+import { latestRejectionByWorkOrder } from "@/lib/rejections";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { RejectionRow, WorkOrderEventRow, WorkOrderRow } from "@/types/database";
 
@@ -119,12 +120,7 @@ export function useLatestRejections() {
       if (error) {
         throw error;
       }
-      const latest: Record<string, LatestRejection> = {};
-      // Newest first, so the first row seen for an order is its latest rejection.
-      for (const row of (data ?? []) as unknown as LatestRejection[]) {
-        latest[row.work_order_id] ??= row;
-      }
-      return latest;
+      return latestRejectionByWorkOrder((data ?? []) as unknown as LatestRejection[]);
     },
   });
 }

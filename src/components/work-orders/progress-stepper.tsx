@@ -1,27 +1,19 @@
 import { Check } from "lucide-react";
 
+import {
+  WORK_ORDER_PROGRESS_STEPS,
+  workOrderProgressStep,
+} from "@/lib/work-order-progress";
 import { cn } from "@/lib/utils";
 import type { WorkOrder } from "@/types/database";
 
-const STEPS = ["Open", "In Progress", "Done", "Attested"] as const;
-
-function currentStep(order: WorkOrder): number {
-  if (order.is_closed) {
-    return STEPS.length;
-  }
-  if (order.status === "Done") {
-    return 2;
-  }
-  return order.status === "In Progress" ? 1 : 0;
-}
-
 /** Visual lifecycle: Open, In Progress, Done, then Captain attestation. */
 export function ProgressStepper({ order }: { order: WorkOrder }) {
-  const current = currentStep(order);
+  const current = workOrderProgressStep(order);
 
   return (
     <ol className="flex items-start" aria-label="Work order progress">
-      {STEPS.map((label, index) => {
+      {WORK_ORDER_PROGRESS_STEPS.map((label, index) => {
         const complete = index < current;
         const active = index === current;
         return (

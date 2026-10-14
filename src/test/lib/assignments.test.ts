@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   assignableProfiles,
+  findAssignment,
   isActiveAssignment,
   resolveAssignmentId,
   unassignedProfiles,
@@ -25,6 +26,14 @@ const row = (
     is_active,
     profile: member ?? profile(profile_id, "Crew"),
   }) as AssignmentRow;
+
+describe("findAssignment", () => {
+  it("locates a row by profile and vessel", () => {
+    const rows = [row("a1", "p1", "v1")];
+    expect(findAssignment(rows, "p1", "v1")?.id).toBe("a1");
+    expect(findAssignment(rows, "p2", "v1")).toBeUndefined();
+  });
+});
 
 describe("resolveAssignmentId", () => {
   it("reuses a removed assignment row and returns null when none exists", () => {

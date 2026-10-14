@@ -31,8 +31,14 @@ import { CreateWorkOrderDialog } from "@/components/work-orders/create-work-orde
 import { WorkOrderLinkRow } from "@/components/work-orders/work-order-link-row";
 import { useSessionContext } from "@/hooks/use-session-context";
 import { useLatestRejections, useWorkOrders } from "@/hooks/use-work-orders";
+import {
+  buildAttentionList,
+  crewRejectedOrders,
+  oldestFirst,
+  visibleAttentionItems,
+} from "@/lib/dashboard-attention";
 import { firstName, greeting } from "@/lib/format";
-import type { UserRole, WorkOrderRow } from "@/types/database";
+import type { UserRole } from "@/types/database";
 
 const HEADER_COPY: Record<UserRole, string> = {
   Admin: "Fleet-wide view. Manage people, vessels and assignments from the sidebar.",
@@ -51,50 +57,6 @@ const REVIEW_HINT: Record<UserRole, string> = {
   Captain: "Needs your attest or reject",
   Crew: "Submitted for Captain review",
 };
-
-interface AttentionList {
-  title: string;
-  description: string;
-  emptyTitle: string;
-  emptyDescription: string;
-  items: WorkOrderRow[];
-  /** Show the most recent items (still ordered oldest to newest) instead of the oldest ones. */
-  latest?: boolean;
-}
-
-/** Orders sorted from oldest to newest by creation time. */
-function oldestFirst(orders: WorkOrderRow[]): WorkOrderRow[] {
-  return [...orders].sort((a, b) => a.created_at.localeCompare(b.created_at));
-}
-
-function buildAttentionList(role: UserRole, orders: WorkOrderRow[]): AttentionList {
-  if (role === "Captain") {
-    return {
-      title: "Waiting for your review",
-      description: "Completed work orders to attest or reject",
-      emptyTitle: "Nothing to review",
-      emptyDescription: "Completed work orders from your crew will appear here.",
-      items: orders.filter((order) => order.status === "Done" && !order.is_closed),
-    };
-  }
-  if (role === "Crew") {
-    return {
-      title: "Your next tasks",
-      description: "Open and in-progress work orders assigned to you",
-      emptyTitle: "You are all caught up",
-      emptyDescription: "New assignments from your Captain will show up here.",
-      items: orders.filter((order) => order.status !== "Done"),
-    };
-  }
-  return {
-    title: "Latest work orders",
-    description: "The most recent work orders on this vessel, oldest first",
-    emptyTitle: "No work orders yet",
-    emptyDescription: "Work orders created by the Captain will appear here.",
-    items: orders,
-    latest: true,
-  };
-}
 
 export default function DashboardPage() {
   const { profile, vessel, hasVesselAccess } = useSessionContext();
@@ -116,14 +78,10 @@ export default function DashboardPage() {
   // (and not yet resubmitted) need rework by the assigned crew member.
   const rejections = rejectionsQuery.data ?? {};
   const rejectedOrders =
-    profile.role === "Crew"
-      ? oldestFirst(
-          orders.filter((order) => order.status === "In Progress" && rejections[order.id]),
-        )
-      : [];
+    profile.role === "Crew" ? crewRejectedOrders(orders, rejections) : [];
   const attention = buildAttentionList(profile.role, orders);
   const sortedItems = oldestFirst(attention.items);
-  const visibleItems = attention.latest ? sortedItems.slice(-5) : sortedItems.slice(0, 5);
+  const visibleItems = visibleAttentionItems(attention, sortedItems);
 
   const actions =
     profile.role === "Captain" && vessel ? (

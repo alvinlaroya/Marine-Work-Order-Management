@@ -41,11 +41,16 @@ describe("permissions", () => {
   it("allows admin management for active admins", () => {
     expect(canManageAdmin(baseProfile({ role: "Admin" }))).toBe(true);
     expect(canManageAdmin(baseProfile({ role: "Captain" }))).toBe(false);
+    expect(canManageAdmin(baseProfile({ role: "Admin", is_active: false }))).toBe(false);
+    expect(canManageAdmin(null)).toBe(false);
   });
 
   it("allows captains to create work orders", () => {
     expect(canCreateWorkOrder(baseProfile({ role: "Captain" }))).toBe(true);
     expect(canCreateWorkOrder(baseProfile({ role: "Crew" }))).toBe(false);
+    expect(canCreateWorkOrder(baseProfile({ role: "Captain", is_active: false }))).toBe(
+      false,
+    );
   });
 
   it("allows assigned crew to update open work orders", () => {
@@ -56,10 +61,17 @@ describe("permissions", () => {
     expect(canCrewUpdateWorkOrder(crew, baseWorkOrder({ assigned_crew_id: "other" }))).toBe(
       false,
     );
+    expect(
+      canCrewUpdateWorkOrder(crew, baseWorkOrder({ assigned_crew_id: "p1", is_closed: true })),
+    ).toBe(false);
+    expect(canCrewUpdateWorkOrder(baseProfile({ is_active: false }), baseWorkOrder())).toBe(
+      false,
+    );
   });
 
   it("allows captain review only for done, unclosed orders", () => {
     const captain = baseProfile({ role: "Captain" });
+    const admin = baseProfile({ role: "Admin" });
     expect(
       canReviewWorkOrder(
         captain,
@@ -68,8 +80,20 @@ describe("permissions", () => {
     ).toBe(true);
     expect(
       canReviewWorkOrder(
+        admin,
+        baseWorkOrder({ status: "Done", is_closed: false }),
+      ),
+    ).toBe(true);
+    expect(
+      canReviewWorkOrder(
         captain,
         baseWorkOrder({ status: "In Progress", is_closed: false }),
+      ),
+    ).toBe(false);
+    expect(
+      canReviewWorkOrder(
+        captain,
+        baseWorkOrder({ status: "Done", is_closed: true }),
       ),
     ).toBe(false);
   });
