@@ -8,8 +8,13 @@ export function Toaster() {
       position="bottom-right"
       richColors
       closeButton
-      offset={{ bottom: 16, right: 16 }}
-      mobileOffset={{ bottom: 16, left: 16, right: 16 }}
+      // Lift toasts above the on-screen keyboard (see `useKeyboardInset`).
+      offset={{ bottom: "calc(16px + var(--keyboard-inset, 0px))", right: 16 }}
+      mobileOffset={{
+        bottom: "calc(16px + var(--keyboard-inset, 0px))",
+        left: 16,
+        right: 16,
+      }}
     />
   );
 }

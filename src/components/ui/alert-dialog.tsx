@@ -36,7 +36,7 @@ const AlertDialogContent = React.forwardRef<
       className={cn(
         // Bottom sheet below `md` (no swipe-to-dismiss: an alert needs an explicit
         // choice), centred modal from `md` up.
-        "fixed inset-x-0 bottom-0 z-50 grid w-full gap-4 rounded-t-2xl border-t bg-background p-6 pb-[max(env(safe-area-inset-bottom),1.5rem)] shadow-xl duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out max-md:data-[state=closed]:slide-out-to-bottom max-md:data-[state=open]:slide-in-from-bottom md:inset-x-auto md:bottom-auto md:left-1/2 md:top-1/2 md:w-[calc(100%-2rem)] md:max-w-md md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-xl md:border md:pb-6 md:data-[state=closed]:fade-out-0 md:data-[state=open]:fade-in-0 md:data-[state=closed]:zoom-out-95 md:data-[state=open]:zoom-in-95",
+        "fixed inset-x-0 bottom-[var(--keyboard-inset,0px)] z-50 grid max-h-[calc(100dvh_-_var(--keyboard-inset,0px)_-_0.5rem)] w-full overflow-y-auto gap-4 rounded-t-2xl border-t bg-background p-6 pb-[max(env(safe-area-inset-bottom),1.5rem)] shadow-xl duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out max-md:data-[state=closed]:slide-out-to-bottom max-md:data-[state=open]:slide-in-from-bottom md:inset-x-auto md:bottom-auto md:left-1/2 md:top-[calc((100dvh_-_var(--keyboard-inset,0px))_/_2)] md:w-[calc(100%-2rem)] md:max-w-md md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-xl md:border md:pb-6 md:data-[state=closed]:fade-out-0 md:data-[state=open]:fade-in-0 md:data-[state=closed]:zoom-out-95 md:data-[state=open]:zoom-in-95",
         className,
       )}
       {...props}

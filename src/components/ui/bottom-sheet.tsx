@@ -130,7 +130,7 @@ const BottomSheetContent = React.forwardRef<
         }}
         style={{ ...style, ...drag.style }}
         className={cn(
-          "fixed inset-x-0 bottom-0 z-[60] flex max-h-[85dvh] flex-col rounded-t-2xl border-t bg-popover text-popover-foreground shadow-2xl outline-none duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
+          "fixed inset-x-0 bottom-[var(--keyboard-inset,0px)] z-[60] flex max-h-[min(85dvh,calc(100dvh_-_var(--keyboard-inset,0px)_-_0.5rem))] flex-col rounded-t-2xl border-t bg-popover text-popover-foreground shadow-2xl outline-none duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
           className,
         )}
         {...props}
